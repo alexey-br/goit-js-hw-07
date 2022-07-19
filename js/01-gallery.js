@@ -2,25 +2,11 @@ import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
 const galleryRef = document.querySelector('.gallery');
+const galleryMarkup = createGalleryMarkup(galleryItems);
+
+galleryRef.innerHTML = galleryMarkup;
 
 galleryRef.addEventListener('click', onGalleryItemClick);
-
-const galleryMarkup = galleryItems
-  .map(({ preview, original, description }) => {
-    return `<div class="gallery__item">
-    <a class="gallery__link" href="${original}">
-      <img
-        class="gallery__image"
-        src="${preview}"
-        data-source="${original}"
-        alt="${description}"
-      />
-    </a>
-  </div>`;
-  })
-  .join('');
-
-galleryRef.insertAdjacentHTML('beforeend', galleryMarkup);
 
 function onGalleryItemClick(e) {
   e.preventDefault();
@@ -32,21 +18,40 @@ function onGalleryItemClick(e) {
   openOriginalImg(originalUrl);
 }
 
+function createGalleryMarkup(items) {
+  return items
+    .map(
+      ({ preview, original, description }) =>
+        `<div class="gallery__item">
+    <a class="gallery__link" href="${original}">
+      <img
+        class="gallery__image"
+        src="${preview}"
+        data-source="${original}"
+        alt="${description}"
+      />
+    </a>
+  </div>`
+    )
+    .join('');
+}
+
 function getOriginalUrl(elem) {
   return elem.dataset.source;
 }
 
 function openOriginalImg(originalUrl) {
-  const originalImg = basicLightbox.create(`<img src="${originalUrl}">`);
+  const originalImg = basicLightbox.create(`<img src="${originalUrl}">`, {
+    onShow: () => document.addEventListener('keydown', modalCloseWithEsc),
+    onClose: () => document.removeEventListener('keydown', modalCloseWithEsc),
+  });
   originalImg.show();
-
-  closeModalWithEscape(originalImg);
+  document.openedModal = originalImg;
 }
 
-function closeModalWithEscape(openedModal) {
-  document.addEventListener('keydown', e => {
-    if (e.code === 'Escape') {
-      openedModal.close();
-    }
-  });
+function modalCloseWithEsc(e) {
+  if (e.code === 'Escape') {
+    document.openedModal.close();
+    delete document.openedModal;
+  }
 }
