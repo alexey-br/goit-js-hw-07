@@ -6,19 +6,11 @@ const galleryMarkup = createGalleryMarkup(galleryItems);
 
 galleryRef.innerHTML = galleryMarkup;
 
-galleryRef.addEventListener('click', onGalleryItemClick);
-
 const gallery = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionPosition: 'bottom',
   captionDelay: 250,
 });
-
-function onGalleryItemClick(e) {
-  e.preventDefault();
-
-  if (e.target.nodeName !== 'IMG') return;
-}
 
 function createGalleryMarkup(items) {
   return items
